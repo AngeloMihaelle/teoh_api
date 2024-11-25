@@ -1,11 +1,3 @@
-name: Build and deploy JAR app to Azure Web App - teoh-api
-
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -22,11 +14,14 @@ jobs:
       - name: Build with Maven
         run: mvn clean install
 
+      - name: List target directory contents
+        run: ls -alh target/  # Debugging step to ensure the .jar exists
+
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: java-app
-          path: '${{ github.workspace }}/target/*.jar'  # Corrected to match .jar file
+          path: '${{ github.workspace }}/target/*.jar'
 
   deploy:
     runs-on: ubuntu-latest
@@ -35,7 +30,7 @@ jobs:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
-      id-token: write #This is required for requesting the JWT
+      id-token: write
 
     steps:
       - name: Download artifact from build job
@@ -43,12 +38,15 @@ jobs:
         with:
           name: java-app
 
+      - name: List downloaded artifact contents
+        run: ls -alh  # Debugging step to verify the artifact is available
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_385F97ACE1D64EDCA6E414B0B58D4EFE }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_7F0120F8762F49ECAE8077432B13800F }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_1A6721A7EDEB4626A3765956755B24C3 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
@@ -56,4 +54,4 @@ jobs:
         with:
           app-name: 'teoh-api'
           slot-name: 'Production'
-          package: '${{ github.workspace }}/target/*.jar'  # Corrected to match .jar file
+          package: '${{ github.workspace }}/target/*.jar'  # Ensure this matches the correct file name
