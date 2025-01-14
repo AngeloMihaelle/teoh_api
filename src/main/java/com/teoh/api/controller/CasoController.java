@@ -12,6 +12,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/casos")
 @Tag(name = "Casos", description = "Operaciones relacionadas con casos de éxito y testimonios")
+@CrossOrigin(origins = "*")
 public class CasoController {
 
     private final CasoService casoService;

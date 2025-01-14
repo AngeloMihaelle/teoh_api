@@ -12,6 +12,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/articulos")
 @Tag(name = "Artículos del Blog", description = "Operaciones relacionadas con los artículos del blog")
+@CrossOrigin(origins = "*")
 public class ArticuloDelBlogController {
 
     private final ArticuloDelBlogService articuloDelBlogService;
